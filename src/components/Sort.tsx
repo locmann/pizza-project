@@ -1,29 +1,89 @@
-export const Sort = () => {
+import { useState } from "react";
+import { SortType } from "../pages/Home";
+
+type PropsType = {
+  value: SortType;
+  onClickSort: (value: SortType) => void;
+  order: boolean;
+  changeOrder: (b: boolean) => void;
+};
+
+export const Sort: React.FC<PropsType> = ({
+  value,
+  onClickSort,
+  order,
+  changeOrder,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  //const [popupIndex, setPopupIndex] = useState(0);
+  const sortPopup = [
+    { name: "популярности", sortName: "rating" },
+    { name: "цене", sortName: "price" },
+    { name: "алфавиту", sortName: "title" },
+  ];
+
+  const setSort = (value: SortType) => {
+    onClickSort(value);
+    setIsOpen(false);
+  };
+
   return (
     <div className="sort">
       <div className="sort__label">
-        <svg
-          width="10"
-          height="6"
-          viewBox="0 0 10 6"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M10 5C10 5.16927 9.93815 5.31576 9.81445 5.43945C9.69075 5.56315 9.54427 5.625 9.375 5.625H0.625C0.455729 5.625 0.309245 5.56315 0.185547 5.43945C0.061849 5.31576 0 5.16927 0 5C0 4.83073 0.061849 4.68424 0.185547 4.56055L4.56055 0.185547C4.68424 0.061849 4.83073 0 5 0C5.16927 0 5.31576 0.061849 5.43945 0.185547L9.81445 4.56055C9.93815 4.68424 10 4.83073 10 5Z"
-            fill="#2C2C2C"
-          />
-        </svg>
+        <div onClick={() => changeOrder(!order)}>
+          {order ? (
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 4V20M12 4L8 8M12 4L16 8"
+                stroke="#000000"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          ) : (
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 4V20M12 20L8 16M12 20L16 16"
+                stroke="#000000"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          )}
+        </div>
+
         <b>Сортировка по:</b>
-        <span>популярности</span>
+        <span onClick={() => setIsOpen(!isOpen)}>{value.name}</span>
       </div>
-      <div className="sort__popup">
-        <ul>
-          <li className="active">популярности</li>
-          <li>цене</li>
-          <li>алфавиту</li>
-        </ul>
-      </div>
+      {isOpen && (
+        <div className="sort__popup">
+          <ul>
+            {sortPopup.map((m, i) => (
+              <li
+                onClick={() => setSort(m)}
+                key={i}
+                className={value.name === m.name ? "active" : ""}
+              >
+                {m.name}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };

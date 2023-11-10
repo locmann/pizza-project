@@ -1,31 +1,33 @@
-import React from "react";
-import logo from "./logo.svg";
 import "./App.css";
 import { Header } from "./components/Header";
-import { Categories } from "./components/Categories";
-import { Sort } from "./components/Sort";
-import { Pizza } from "./components/Pizza";
 import "./scss/app.scss";
-import pizzas from "./assets/pizzas.json";
+import pizzas from "./assets/pizzas.json"; //кринж
+import { Home } from "./pages/Home";
+import { Outlet, Route, Routes } from "react-router-dom";
+import { createContext, useState } from "react";
+
+export type PizzasType = typeof pizzas;
+type ContextType = {
+  searchPizzas: string;
+  setSearchPizzas: React.Dispatch<React.SetStateAction<string>>;
+};
+const defaultContextValue: ContextType = {
+  searchPizzas: "",
+  setSearchPizzas: () => {},
+};
+export const SearchContext = createContext(defaultContextValue);
 
 function App() {
+  const [searchPizzas, setSearchPizzas] = useState("");
+
   return (
     <div className="wrapper">
-      <Header />
-      <div className="content">
-        <div className="container">
-          <div className="content__top">
-            <Categories />
-            <Sort />
-          </div>
-          <h2 className="content__title">Все пиццы</h2>
-          <div className="content__items">
-            {pizzas.map((m) => (
-              <Pizza {...m} />
-            ))}
-          </div>
+      <SearchContext.Provider value={{ searchPizzas, setSearchPizzas }}>
+        <Header />
+        <div className="content">
+          <Outlet context={searchPizzas} />
         </div>
-      </div>
+      </SearchContext.Provider>
     </div>
   );
 }
