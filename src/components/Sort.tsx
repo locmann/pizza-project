@@ -1,32 +1,26 @@
 import { useState } from "react";
 import { SortType } from "../pages/Home";
+import { SortObjType, changeSort } from "../redux/slices/filterSlice";
+import { useDispatch } from "react-redux";
 
 type PropsType = {
-  value: SortType;
-  onClickSort: (value: SortType) => void;
+  value: SortObjType;
   order: boolean;
   changeOrder: (b: boolean) => void;
 };
 
-export const Sort: React.FC<PropsType> = ({
-  value,
-  onClickSort,
-  order,
-  changeOrder,
-}) => {
+export const Sort: React.FC<PropsType> = ({ value, order, changeOrder }) => {
   const [isOpen, setIsOpen] = useState(false);
-  //const [popupIndex, setPopupIndex] = useState(0);
   const sortPopup = [
     { name: "популярности", sortName: "rating" },
     { name: "цене", sortName: "price" },
     { name: "алфавиту", sortName: "title" },
   ];
-
-  const setSort = (value: SortType) => {
-    onClickSort(value);
+  const dispatch = useDispatch();
+  const setSort = (value: SortObjType) => {
+    dispatch(changeSort(value));
     setIsOpen(false);
   };
-
   return (
     <div className="sort">
       <div className="sort__label">
@@ -40,7 +34,7 @@ export const Sort: React.FC<PropsType> = ({
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
-                d="M12 4V20M12 4L8 8M12 4L16 8"
+                d="M12 4V20M12 20L8 16M12 20L16 16"
                 stroke="#000000"
                 strokeWidth="2"
                 strokeLinecap="round"
@@ -56,7 +50,7 @@ export const Sort: React.FC<PropsType> = ({
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
-                d="M12 4V20M12 20L8 16M12 20L16 16"
+                d="M12 4V20M12 4L8 8M12 4L16 8"
                 stroke="#000000"
                 strokeWidth="2"
                 strokeLinecap="round"

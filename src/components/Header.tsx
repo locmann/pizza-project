@@ -2,8 +2,14 @@ import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import { SearchContext } from "../App";
 import { Search } from "./Search/Search";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
 
 export const Header: React.FC = () => {
+  const pizzasCount = useSelector((state: RootState) =>
+    state.cart.boughtPizzas.reduce((count, item) => count + item.count, 0)
+  );
+  const cartPrice = useSelector((state: RootState) => state.cart.cartPrice);
   return (
     <div className="header">
       <div className="container">
@@ -21,7 +27,7 @@ export const Header: React.FC = () => {
         <Link to="cart">
           <div className="header__cart">
             <a href="/cart.html" className="button button--cart">
-              <span>520 ₽</span>
+              <span>{cartPrice} ₽</span>
               <div className="button__delimiter"></div>
               <svg
                 width="18"
@@ -52,7 +58,7 @@ export const Header: React.FC = () => {
                   strokeLinejoin="round"
                 />
               </svg>
-              <span>3</span>
+              <span>{pizzasCount}</span>
             </a>
           </div>
         </Link>

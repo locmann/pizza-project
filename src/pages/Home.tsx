@@ -7,8 +7,9 @@ import Skeleton from "../components/Skeleton";
 import { Sort } from "../components/Sort";
 import { useOutletContext } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../redux/store";
-import { decrement, increment } from "../redux/slices/counterSlice";
+import { RootState, useAppDispatch } from "../redux/store";
+import axios from "axios";
+import { fetchPizzas } from "../redux/slices/pizzasSlice";
 
 export type SortType = {
   name: string;
@@ -16,60 +17,28 @@ export type SortType = {
 };
 
 export const Home = () => {
-  const count = useSelector((state: RootState) => state.counter.value);
-  const dispatch = useDispatch();
-
+  const pizzaCategory = useSelector(
+    (state: RootState) => state.filter.category
+  );
+  const pizzaSort = useSelector((state: RootState) => state.filter.sortObj);
   const searchPizzas: string = useOutletContext();
-  const [items, setItems] = useState<PizzasType>([]);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [pizzaCategories, setPizzaCategories] = useState(0);
-  const [pizzaSort, setPizzaSort] = useState({
-    name: "популярности",
-    sortName: "rating",
-  });
+
   const [order, setOrder] = useState(false);
-  useEffect(() => {
-    setIsLoaded(false);
-    let url = `https://6548d469dd8ebcd4ab23b083.mockapi.io/items?${
-      pizzaCategories > 0 ? `category=${pizzaCategories}` : ""
-    }&sortBy=${pizzaSort.sortName}&order=${
-      order ? "desc" : "asc"
-    }&search=${searchPizzas}`;
-    fetch(url)
-      .then((response) => {
-        return response.json();
-      })
-      .then((data) => {
-        setItems(data);
-        setIsLoaded(true);
-      });
+  const dispatch = useAppDispatch();
+  const { items, status } = useSelector((state: RootState) => state.pizzas);
+  const getPizzas = async () => {
+    dispatch(fetchPizzas({ pizzaCategory, pizzaSort, order, searchPizzas }));
     window.scrollTo(0, 0);
-  }, [pizzaCategories, pizzaSort, order, searchPizzas]);
+  };
+  useEffect(() => {
+    getPizzas();
+  }, [pizzaCategory, pizzaSort, order, searchPizzas]);
   return (
     <div className="container">
-      <div>
-        <button
-          aria-label="Increment value"
-          onClick={() => dispatch(increment())}
-        >
-          Increment
-        </button>
-        <span>{count}</span>
-        <button
-          aria-label="Decrement value"
-          onClick={() => dispatch(decrement())}
-        >
-          Decrement
-        </button>
-      </div>
       <div className="content__top">
-        <Categories
-          value={pizzaCategories}
-          onClickCategory={(id: number) => setPizzaCategories(id)}
-        />
+        <Categories value={pizzaCategory} />
         <Sort
           value={pizzaSort}
-          onClickSort={(value: SortType) => setPizzaSort(value)}
           order={order}
           changeOrder={(b: boolean) => setOrder(b)}
         />
@@ -77,7 +46,7 @@ export const Home = () => {
       <h2 className="content__title">Все пиццы</h2>
 
       <div className="content__items">
-        {isLoaded
+        {status === "fulfilled"
           ? items.map((m) => <Pizza key={m.id} {...m} />)
           : [...new Array(6)].map((_, i) => <Skeleton key={i} />)}
       </div>

@@ -6,7 +6,7 @@ import { Home } from "./pages/Home";
 import { Outlet, Route, Routes } from "react-router-dom";
 import { createContext, useState } from "react";
 
-export type PizzasType = typeof pizzas;
+export type PizzasType = (typeof pizzas)[0]; //!!!!!!!
 type ContextType = {
   searchPizzas: string;
   setSearchPizzas: React.Dispatch<React.SetStateAction<string>>;

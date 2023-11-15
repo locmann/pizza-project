@@ -1,12 +1,17 @@
 import React, { useState } from "react";
+import { addPizza } from "../redux/slices/cartSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../redux/store";
+import { PizzasType } from "../App";
 
-type PizzasType = {
+/* type PizzasType = {
   imageUrl: string;
   title: string;
   types: number[];
   sizes: number[];
   price: number;
-};
+  id: number;
+}; */
 
 export const Pizza: React.FC<PizzasType> = ({
   imageUrl,
@@ -14,12 +19,33 @@ export const Pizza: React.FC<PizzasType> = ({
   types,
   sizes,
   price,
+  id,
 }) => {
-  const [counter, setCounter] = useState(0);
   const [dough, setDough] = useState(0);
   const [pizzaSize, setPizzaSize] = useState(0);
 
   const doughTypes = ["тонкое", "традиционное"];
+
+  const dispatch = useDispatch();
+
+  const onClickButton = () => {
+    const addedPizza = {
+      imageUrl,
+      title,
+      price,
+      id,
+      type: doughTypes[dough],
+      size: sizes[pizzaSize],
+      count: 1,
+    };
+
+    dispatch(addPizza(addedPizza));
+  };
+  const pizzasCount = useSelector((state: RootState) =>
+    state.cart.boughtPizzas.find((item) => item.id === id)
+  );
+  const addedCount = pizzasCount ? pizzasCount.count : 0;
+
   return (
     <div className="pizza-block-wrapper">
       <div className="pizza-block">
@@ -52,7 +78,7 @@ export const Pizza: React.FC<PizzasType> = ({
         <div className="pizza-block__bottom">
           <div className="pizza-block__price">от {price} ₽</div>
           <button
-            onClick={() => setCounter(counter + 1)}
+            onClick={() => onClickButton()}
             className="button button--outline button--add"
           >
             <svg
@@ -68,7 +94,7 @@ export const Pizza: React.FC<PizzasType> = ({
               />
             </svg>
             <span>Добавить</span>
-            <i>{counter}</i>
+            {addedCount > 0 && <i>{addedCount}</i>}
           </button>
         </div>
       </div>
