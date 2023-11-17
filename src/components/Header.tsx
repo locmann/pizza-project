@@ -1,15 +1,29 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { SearchContext } from "../App";
 import { Search } from "./Search/Search";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
+import { selectCartItem } from "../redux/slices/cartSlice";
 
 export const Header: React.FC = () => {
   const pizzasCount = useSelector((state: RootState) =>
     state.cart.boughtPizzas.reduce((count, item) => count + item.count, 0)
   );
   const cartPrice = useSelector((state: RootState) => state.cart.cartPrice);
+
+  const items = useSelector(selectCartItem);
+
+  const isMounted = useRef(false);
+
+  useEffect(() => {
+    if (isMounted.current) {
+      const json = JSON.stringify(items);
+      localStorage.setItem("cart", json);
+    }
+    isMounted.current = true;
+  }, [items]);
+
   return (
     <div className="header">
       <div className="container">

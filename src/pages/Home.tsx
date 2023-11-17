@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useState, useEffect } from "react";
 import { PizzasType } from "../App";
 import { Categories } from "../components/Categories";
@@ -30,9 +30,11 @@ export const Home = () => {
     dispatch(fetchPizzas({ pizzaCategory, pizzaSort, order, searchPizzas }));
     window.scrollTo(0, 0);
   };
+
   useEffect(() => {
     getPizzas();
   }, [pizzaCategory, pizzaSort, order, searchPizzas]);
+
   return (
     <div className="container">
       <div className="content__top">

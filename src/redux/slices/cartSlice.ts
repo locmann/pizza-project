@@ -1,5 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
+import { RootState } from "../store";
+import { getDataFromLS } from "../../utils/getDataFromLS";
+import { calculateCart } from "../../utils/calculateCart";
 
 type IniType = {
   boughtPizzas: PizzaCartType[];
@@ -7,7 +10,7 @@ type IniType = {
   // totalPizzasCount: number
 };
 
-type PizzaCartType = {
+export type PizzaCartType = {
   imageUrl: string;
   title: string;
   price: number;
@@ -17,9 +20,11 @@ type PizzaCartType = {
   count: number;
 };
 
+const { boughtPizzas, cartPrice } = getDataFromLS();
+
 const initialState: IniType = {
-  boughtPizzas: [],
-  cartPrice: 0,
+  boughtPizzas,
+  cartPrice,
   // totalPizzasCount: 0
 };
 
@@ -37,11 +42,12 @@ export const cartSlice = createSlice({
       } else {
         state.boughtPizzas.push(action.payload);
       }
-
-      state.cartPrice = state.boughtPizzas.reduce(
+      state.cartPrice = calculateCart(
+        state.boughtPizzas
+      ); /* state.boughtPizzas.reduce(
         (curSum, item) => item.price * item.count + curSum,
         0
-      );
+      ); */
     },
     removePizza: (state, action: PayloadAction<number>) => {
       const index = state.boughtPizzas.findIndex(
@@ -49,10 +55,12 @@ export const cartSlice = createSlice({
       );
 
       state.boughtPizzas.splice(index, 1);
-      state.cartPrice = state.boughtPizzas.reduce(
+      state.cartPrice = calculateCart(
+        state.boughtPizzas
+      ); /* state.boughtPizzas.reduce(
         (curSum, item) => item.price * item.count + curSum,
         0
-      );
+      ); */
     },
     increment: (state, action: PayloadAction<number>) => {
       const currentPizza = state.boughtPizzas.find(
@@ -60,10 +68,12 @@ export const cartSlice = createSlice({
       );
       if (currentPizza) {
         currentPizza.count += 1;
-        state.cartPrice = state.boughtPizzas.reduce(
+        state.cartPrice = calculateCart(
+          state.boughtPizzas
+        ); /* state.boughtPizzas.reduce(
           (curSum, item) => item.price * item.count + curSum,
           0
-        );
+        ); */
       }
     },
     decrement: (state, action: PayloadAction<number>) => {
@@ -79,10 +89,12 @@ export const cartSlice = createSlice({
       }
       if (currentPizza) {
         currentPizza.count -= 1;
-        state.cartPrice = state.boughtPizzas.reduce(
+        state.cartPrice = calculateCart(
+          state.boughtPizzas
+        ); /* state.boughtPizzas.reduce(
           (curSum, item) => item.price * item.count + curSum,
           0
-        );
+        ); */
       }
     },
     clear: (state) => {
@@ -94,5 +106,7 @@ export const cartSlice = createSlice({
 
 export const { addPizza, clear, removePizza, increment, decrement } =
   cartSlice.actions;
+
+export const selectCartItem = (state: RootState) => state.cart.boughtPizzas;
 
 export default cartSlice.reducer;
